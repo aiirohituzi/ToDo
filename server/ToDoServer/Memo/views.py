@@ -91,3 +91,49 @@ def get_memo_by_groupId(request):
     print(data)
 
     return HttpResponse(data, content_type="application/json")
+
+
+def update_memo(request):
+    user = request.POST['user']
+    memo = request.POST['memo']
+    # memo 안에 JSON 오브젝트 형태로 담을 예정
+    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+
+    ########################
+    # user 검증 코드 들어가야함 #
+    # 아니면 데코레이터로 처리   #
+    ########################
+
+    try:
+        row = Memo.objects.get(id=memo.id)
+    except Photo.DoesNotExist:
+        print("[Update request: Memo] Failed!!! No Memo matches the given query.")
+        return HttpResponseServerError()
+
+    row.group = memo.group
+    row.content = memo.content
+    row.isDo = memo.isDo == 'True'
+    row.isStar = memo.isStar == 'True'
+    row.targetDate = memo.targetDate
+
+    row.save()
+    return HttpResponse(status=200)
+
+
+def delete_memo(request):
+    user = request.POST['user']
+    memo_id = request.POST['memoId']
+
+    ########################
+    # user 검증 코드 들어가야함 #
+    # 아니면 데코레이터로 처리   #
+    ########################
+
+    try:
+        row = Memo.objects.get(id=memo.id)
+    except Photo.DoesNotExist:
+        print("[Update request: Memo] Failed!!! No Memo matches the given query.")
+        return HttpResponseServerError()
+
+    row.delete()
+    return HttpResponse(status=200)
