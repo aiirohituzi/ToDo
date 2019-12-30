@@ -104,9 +104,13 @@ def add_memo(request):
     # 아니면 데코레이터로 처리   #
     ########################
 
-    memo_obj = Memo(owner=user, group=memo.group, content=memo.content,
-                    isDo=memo.isDo, isStar=memo.isStar, targetDate=memo.targetDate)
-    memo_obj.save()
+    try:
+        memo_obj = Memo(owner=user, group=memo.group, content=memo.content,
+                        isDo=memo.isDo, isStar=memo.isStar, targetDate=memo.targetDate)
+        memo_obj.save()
+    except:
+        print("[Add request: Memo] ERROR")
+        return HttpResponseServerError()
     return HttpResponse(status=200)
 
 
@@ -122,24 +126,24 @@ def update_memo(request):
     ########################
 
     try:
-        row = Memo.objects.get(id=memo.id)
+        memo_obj = Memo.objects.get(id=memo.id)
     except Photo.DoesNotExist:
         print("[Update request: Memo] Failed!!! No Memo matches the given query.")
         return HttpResponseServerError()
 
-    row.group = memo.group
-    row.content = memo.content
-    row.isDo = memo.isDo == 'True'
-    row.isStar = memo.isStar == 'True'
-    row.targetDate = memo.targetDate
+    memo_obj.group = memo.group
+    memo_obj.content = memo.content
+    memo_obj.isDo = memo.isDo == 'True'
+    memo_obj.isStar = memo.isStar == 'True'
+    memo_obj.targetDate = memo.targetDate
 
-    row.save()
+    memo_obj.save()
     return HttpResponse(status=200)
 
 
 def delete_memo(request):
     user = request.POST['user']
-    memo_id = request.POST['memoId']
+    memo_id = request.POST['memo_id']
 
     ########################
     # user 검증 코드 들어가야함 #
@@ -147,10 +151,70 @@ def delete_memo(request):
     ########################
 
     try:
-        row = Memo.objects.get(id=memo.id)
+        memo_obj = Memo.objects.get(id=memo_id)
     except Photo.DoesNotExist:
         print("[Update request: Memo] Failed!!! No Memo matches the given query.")
         return HttpResponseServerError()
 
-    row.delete()
+    memo_obj.delete()
+    return HttpResponse(status=200)
+
+
+def add_group(request):
+    user = request.POST['user']
+    group_name = request.POST['group_name']
+
+    ########################
+    # user 검증 코드 들어가야함 #
+    # 아니면 데코레이터로 처리   #
+    ########################
+
+    try:
+        group_obj = Group(owner=user, group_name=group_name)
+        group_obj.save()
+    except:
+        print("[Add request: Group] ERROR")
+        return HttpResponseServerError()
+    return HttpResponse(status=200)
+
+
+def update_group(request):
+    user = request.POST['user']
+    group = request.POST['group']
+    # group 안에 JSON 오브젝트 형태로 담을 예정
+    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+
+    ########################
+    # user 검증 코드 들어가야함 #
+    # 아니면 데코레이터로 처리   #
+    ########################
+
+    try:
+        group_obj = Group.objects.get(id=group.id)
+    except Group.DoesNotExist:
+        print("[Update request: Group] Failed!!! No Group matches the given query.")
+        return HttpResponseServerError()
+
+    group_obj.group_name = group.group_name
+
+    group_obj.save()
+    return HttpResponse(status=200)
+
+
+def delete_group(request):
+    user = request.POST['user']
+    group_id = request.POST['group_id']
+
+    ########################
+    # user 검증 코드 들어가야함 #
+    # 아니면 데코레이터로 처리   #
+    ########################
+
+    try:
+        group_obj = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        print("[Update request: Group] Failed!!! No Group matches the given query.")
+        return HttpResponseServerError()
+
+    group_obj.delete()
     return HttpResponse(status=200)
