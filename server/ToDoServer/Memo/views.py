@@ -2,6 +2,7 @@ from django.shortcuts import render
 from Memo.models import Group
 from Memo.models import Memo
 from django.http import HttpResponseServerError
+from django.db.models import Max
 
 # Create your views here.
 
@@ -15,6 +16,7 @@ def get_all_memo(request):
         for item in Memo.objects.filter(owner=user).order_by('-created_at'):
             data.append({
                 'id': item.id,
+                'index': item.index,
                 'owner': item.owner,
                 'group': item.group,
                 'content': item.content,
@@ -44,6 +46,7 @@ def get_all_group(request):
         for item in Group.objects.filter(owner=user).order_by('-created_at'):
             data.append({
                 'id': item.id,
+                'index': item.index,
                 'owner': item.owner,
                 'group_name': item.group,
             })
@@ -73,6 +76,7 @@ def get_memo_by_group_id(request, group_id):
         for item in Memo.objects.filter(Q(user=user) & Q(group=group_id)).order_by('-created_at'):
             data.append({
                 'id': item.id,
+                'index': item.index,
                 'owner': item.owner,
                 'group': item.group,
                 'content': item.content,
@@ -104,8 +108,10 @@ def add_memo(request):
     # 아니면 데코레이터로 처리   #
     ########################
 
+    last_memo_index = Memo.objects.aggregate(index=Max('index'))['index'] or 0
+
     try:
-        memo_obj = Memo(owner=user, group=memo.group, content=memo.content,
+        memo_obj = Memo(index=last_memo_index, owner=user, group=memo.group, content=memo.content,
                         isDo=memo.isDo, isStar=memo.isStar, targetDate=memo.targetDate)
         memo_obj.save()
     except:
@@ -124,6 +130,10 @@ def update_memo(request):
     # user 검증 코드 들어가야함 #
     # 아니면 데코레이터로 처리   #
     ########################
+
+    # 수정작업 시 index 처리 경우의 수
+    # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
+    # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
 
     try:
         memo_obj = Memo.objects.get(id=memo.id)
@@ -157,6 +167,9 @@ def delete_memo(request):
         return HttpResponseServerError()
 
     memo_obj.delete()
+
+    # 삭제 시 삭제할 항목의 뒷번호들의 index--
+
     return HttpResponse(status=200)
 
 
@@ -169,8 +182,12 @@ def add_group(request):
     # 아니면 데코레이터로 처리   #
     ########################
 
+    last_group_index = Group.objects.aggregate(
+        index=Max('index'))['index'] or 0
+
     try:
-        group_obj = Group(owner=user, group_name=group_name)
+        group_obj = Group(index=last_group_index,
+                          owner=user, group_name=group_name)
         group_obj.save()
     except:
         print("[Add request: Group] ERROR")
@@ -188,6 +205,10 @@ def update_group(request):
     # user 검증 코드 들어가야함 #
     # 아니면 데코레이터로 처리   #
     ########################
+
+    # 수정작업 시 index 처리 경우의 수
+    # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
+    # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
 
     try:
         group_obj = Group.objects.get(id=group.id)
@@ -217,4 +238,7 @@ def delete_group(request):
         return HttpResponseServerError()
 
     group_obj.delete()
+
+    # 삭제 시 삭제할 항목의 뒷번호들의 index--
+
     return HttpResponse(status=200)

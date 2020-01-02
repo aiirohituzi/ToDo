@@ -5,11 +5,13 @@ from django.contrib.auth.models import User
 
 
 class Group(models.Model):
+    index = models.IntegerField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     group_name = models.CharField(max_length=50)
 
 
 class Memo(models.Model):
+    index = models.IntegerField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True)
     content = models.CharField(max_length=200)
