@@ -131,15 +131,30 @@ def update_memo(request):
     # 아니면 데코레이터로 처리   #
     ########################
 
-    # 수정작업 시 index 처리 경우의 수
-    # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
-    # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
-
     try:
         memo_obj = Memo.objects.get(id=memo.id)
     except Photo.DoesNotExist:
         print("[Update request: Memo] Failed!!! No Memo matches the given query.")
         return HttpResponseServerError()
+
+    # filter(Q(<condition_1>)|Q(<condition_2>))
+
+    if memo.index is not None:
+        if memo_obj.index < memo.index:
+            # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
+            between_memo_set = Memo.objects.filter(
+                Q(id > memo_obj.index) & Q(id <= memo.index))
+            for between_memo in between_memo_set:
+                between_memo.index = between_memo.index - 1
+            between_memo.save()
+        else if memo_obj.index > memo.index:
+            # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
+            between_memo_set = Memo.objects.filter(
+                Q(id < memo_obj.index) & Q(id >= memo.index))
+            for between_memo in between_memo_set:
+                between_memo.index = between_memo.index + 1
+            between_memo.save()
+        memo_obj.index = memo.index
 
     memo_obj.group = memo.group
     memo_obj.content = memo.content
