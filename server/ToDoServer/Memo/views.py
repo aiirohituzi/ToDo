@@ -108,7 +108,8 @@ def add_memo(request):
     # 아니면 데코레이터로 처리   #
     ########################
 
-    last_memo_index = Memo.objects.aggregate(index=Max('index'))['index'] or 0
+    last_memo_index = Memo.objects.aggregate(
+        index=Max('index'))['index'] + 1 or 0
 
     try:
         memo_obj = Memo(index=last_memo_index, owner=user, group=memo.group, content=memo.content,
@@ -134,7 +135,8 @@ def update_memo_index(request):
     try:
         memo_obj = Memo.objects.get(id=memo.id)
     except Photo.DoesNotExist:
-        print("[Update request: Index of Memo] Failed!!! No Memo matches the given query.")
+        print(
+            "[Update request: Index of Memo] Failed!!! No Memo matches the given query.")
         return HttpResponseServerError()
 
     # filter(Q(<condition_1>)|Q(<condition_2>))
@@ -238,7 +240,7 @@ def add_group(request):
     ########################
 
     last_group_index = Group.objects.aggregate(
-        index=Max('index'))['index'] or 0
+        index=Max('index'))['index'] + 1 or 0
 
     try:
         group_obj = Group(index=last_group_index,
@@ -247,6 +249,47 @@ def add_group(request):
     except:
         print("[Add request: Group] ERROR")
         return HttpResponseServerError()
+    return HttpResponse(status=200)
+
+
+def update_group_index(request):
+    user = request.POST['user']
+    group = request.POST['group']
+    # group 안에 JSON 오브젝트 형태로 담을 예정
+    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+
+    ########################
+    # user 검증 코드 들어가야함 #
+    # 아니면 데코레이터로 처리   #
+    ########################
+
+    try:
+        group_obj = Group.objects.get(id=group.id)
+    except Photo.DoesNotExist:
+        print(
+            "[Update request: Index of Group] Failed!!! No Group matches the given query.")
+        return HttpResponseServerError()
+
+    # filter(Q(<condition_1>)|Q(<condition_2>))
+
+    if group_obj.index < group.index:
+        # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
+        between_group_set = Group.objects.filter(
+            Q(id > group_obj.index) & Q(id <= group.index))
+        for between_group in between_group_set:
+            between_group.index = between_group.index - 1
+        between_group.save()
+    else if group_obj.index > group.index:
+        # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
+        between_group_set = Group.objects.filter(
+            Q(id < group_obj.index) & Q(id >= group.index))
+        for between_group in between_group_set:
+            between_group.index = between_group.index + 1
+        between_group.save()
+
+    group_obj.index = group.index
+    group_obj.save()
+
     return HttpResponse(status=200)
 
 
