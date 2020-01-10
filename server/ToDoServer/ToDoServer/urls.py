@@ -20,4 +20,5 @@ from Memo import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('allMemo/', views.get_all_memo),
+    path('addMemo/', views.add_memo),
 ]

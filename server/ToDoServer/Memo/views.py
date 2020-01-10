@@ -3,6 +3,8 @@ from Memo.models import Group
 from Memo.models import Memo
 from django.http import HttpResponseServerError
 from django.db.models import Max
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 # Create your views here.
 
@@ -97,7 +99,10 @@ def get_memo_by_group_id(request, group_id):
     return HttpResponse(data, content_type="application/json")
 
 
+@csrf_exempt
 def add_memo(request):
+    print(json.loads(request.body))
+    print('------------------------------------------------------------')
     user = request.POST['user']
     memo = request.POST['memo']
     # memo 안에 JSON 오브젝트 형태로 담을 예정
