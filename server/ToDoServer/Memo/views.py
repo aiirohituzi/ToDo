@@ -9,7 +9,7 @@ from django.db.models import Max
 
 def get_all_memo(request):
     data = []
-    user = request.Get.get('user', None)
+    user = request.GET.get('user', None)
     # user에 대한 자세한 값은 후에 인증기능 추가 후 알맞게 수정
     # 임시로 모양만 구현
     try:
@@ -39,7 +39,7 @@ def get_all_memo(request):
 
 def get_all_group(request):
     data = []
-    user = request.Get.get('user', None)
+    user = request.GET.get('user', None)
     # user에 대한 자세한 값은 후에 인증기능 추가 후 알맞게 수정
     # 임시로 모양만 구현
     try:
@@ -64,7 +64,7 @@ def get_all_group(request):
 def get_memo_by_group_id(request, group_id):
     # memo = get_object_or_404(Memo, group=group_id) 이 방식 괜찮은지 후에 검토
     data = []
-    user = request.Get.get('user', None)
+    user = request.GET.get('user', None)
     # user에 대한 자세한 값은 후에 인증기능 추가 후 알맞게 수정
     # 임시로 모양만 구현
     # group 이름을 받든 id를 받든 역시 추후 수정 필요
@@ -148,7 +148,7 @@ def update_memo_index(request):
         for between_memo in between_memo_set:
             between_memo.index = between_memo.index - 1
         between_memo.save()
-    else if memo_obj.index > memo.index:
+    elif memo_obj.index > memo.index:
         # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
         between_memo_set = Memo.objects.filter(
             Q(id < memo_obj.index) & Q(id >= memo.index))
@@ -189,7 +189,7 @@ def update_memo(request):
     #         for between_memo in between_memo_set:
     #             between_memo.index = between_memo.index - 1
     #         between_memo.save()
-    #     else if memo_obj.index > memo.index:
+    #     elif memo_obj.index > memo.index:
     #         # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
     #         between_memo_set = Memo.objects.filter(
     #             Q(id < memo_obj.index) & Q(id >= memo.index))
@@ -279,7 +279,7 @@ def update_group_index(request):
         for between_group in between_group_set:
             between_group.index = between_group.index - 1
         between_group.save()
-    else if group_obj.index > group.index:
+    elif group_obj.index > group.index:
         # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
         between_group_set = Group.objects.filter(
             Q(id < group_obj.index) & Q(id >= group.index))
