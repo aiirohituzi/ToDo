@@ -17,6 +17,11 @@ const Header = () => {
           SSR 테스트
         </a>
       </Link>
+      <Link href="/api-test">
+        <a prefetch style={linkStyle}>
+          API 테스트
+        </a>
+      </Link>
     </div>
   );
 };

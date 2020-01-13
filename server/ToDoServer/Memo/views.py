@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from Memo.models import Group
 from Memo.models import Memo
-from django.http import HttpResponseServerError
+from django.http import HttpResponseServerError, HttpResponse
 from django.db.models import Max
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -101,7 +101,10 @@ def get_memo_by_group_id(request, group_id):
 
 @csrf_exempt
 def add_memo(request):
-    print(json.loads(request.body))
+    req = request.POST['memo']
+    print(req)
+    print(type(req))
+    # print(json.dumps(req, indent=4))
     print('------------------------------------------------------------')
     user = request.POST['user']
     memo = request.POST['memo']
