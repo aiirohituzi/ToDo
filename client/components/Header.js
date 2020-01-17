@@ -22,6 +22,9 @@ const Header = () => {
           API 테스트
         </a>
       </Link>
+      <Link href="/dragAnimation">
+        <a style={linkStyle}>드래그 애니메이션</a>
+      </Link>
     </div>
   );
 };
