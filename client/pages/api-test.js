@@ -12,17 +12,21 @@ class APITest extends React.Component {
   addTest = async () => {
     const data = new FormData();
 
-    const memo_obj = {
-      memo: {
-        content: "test"
-      }
-    };
+    const memo_obj = JSON.stringify({
+      group: "testG",
+      content: "testC",
+      isDo: "testD",
+      isStar: "testS"
+    });
 
     data.append("memo", memo_obj);
 
     const config = {
-      headers: { "content-type": "application/json" }
-      // headers: { "content-type": "multipart/form-data" }
+      // headers: {
+      //   "Content-Type": "application/json",
+      //   "Access-Control-Allow-Origin": "*"
+      // }
+      headers: { "content-type": "multipart/form-data" }
     };
 
     await axios

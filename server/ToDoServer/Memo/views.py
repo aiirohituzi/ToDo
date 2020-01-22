@@ -101,10 +101,9 @@ def get_memo_by_group_id(request, group_id):
 
 @csrf_exempt
 def add_memo(request):
-    req = request.POST['memo']
-    print(req)
-    print(type(req))
-    # print(json.dumps(req, indent=4))
+    memo = json.loads(request.POST['memo'])
+    print(json.dumps(memo, indent=4))
+    print(type(memo))
     print('------------------------------------------------------------')
     user = request.POST['user']
     memo = request.POST['memo']
