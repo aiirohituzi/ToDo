@@ -104,9 +104,10 @@ def add_memo(request):
     memo = json.loads(request.POST['memo'])
     print(json.dumps(memo, indent=4))
     print(type(memo))
+    print(memo.get('group'), memo.get('content'), memo.get('isDo'), memo.get('isStar'))
     print('------------------------------------------------------------')
-    user = request.POST['user']
-    memo = request.POST['memo']
+    # user = request.POST['user']
+    # memo = request.POST['memo']
     # memo 안에 JSON 오브젝트 형태로 담을 예정
     # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
 
@@ -119,9 +120,9 @@ def add_memo(request):
         index=Max('index'))['index'] + 1 or 0
 
     try:
-        memo_obj = Memo(index=last_memo_index, owner=user, group=memo.group, content=memo.content,
-                        isDo=memo.isDo, isStar=memo.isStar, targetDate=memo.targetDate)
-        memo_obj.save()
+        memo_obj = Memo(index=last_memo_index, owner=user, group=memo.get('group'), content=memo.get('content'),
+                        isDo=memo.get('isDo'), isStar=memo.get('isStar'), targetDate=memo.get('targetDate'))
+        # memo_obj.save()
     except:
         print("[Add request: Memo] ERROR")
         return HttpResponseServerError()
