@@ -13,13 +13,13 @@ class APITest extends React.Component {
     const data = new FormData();
 
     const memo_obj = JSON.stringify({
-      group: "testG",
       content: "testC",
-      isDo: "testD",
-      isStar: "testS"
+      isDo: false,
+      isStar: false
     });
 
     data.append("memo", memo_obj);
+    data.append("user", "admin");
 
     const config = {
       // headers: {

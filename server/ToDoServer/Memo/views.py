@@ -102,26 +102,31 @@ def get_memo_by_group_id(request, group_id):
 @csrf_exempt
 def add_memo(request):
     memo = json.loads(request.POST['memo'])
-    print(json.dumps(memo, indent=4))
-    print(type(memo))
-    print(memo.get('group'), memo.get('content'), memo.get('isDo'), memo.get('isStar'))
-    print('------------------------------------------------------------')
-    # user = request.POST['user']
-    # memo = request.POST['memo']
-    # memo 안에 JSON 오브젝트 형태로 담을 예정
-    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+    print(json.dumps(memo, indent=4), type(memo))
+    user = request.POST['user']
+    print(user, type(user))
+
+    # group = memo.get('group') if memo.get('group') is not None else ''
+    group = None
+    content = memo.get('content') if memo.get('content') is not None else ''
+    isDo = memo.get('isDo') if memo.get('isDo') is not None else False
+    isStar = memo.get('isStar') if memo.get('isStar') is not None else False
+    targetDate = memo.get('targetDate') if memo.get('targetDate') is not None else None
+
+    print(group, content, isDo, isStar, targetDate)
 
     ########################
     # user 검증 코드 들어가야함 #
     # 아니면 데코레이터로 처리   #
     ########################
 
-    last_memo_index = Memo.objects.aggregate(
-        index=Max('index'))['index'] + 1 or 0
-
+    last_memo_index_obj = Memo.objects.aggregate(
+        index=Max('index')).get('index')
+    last_memo_index = last_memo_index_obj + 1 if last_memo_index_obj is not None else 0
+    print(last_memo_index)
     try:
-        memo_obj = Memo(index=last_memo_index, owner=user, group=memo.get('group'), content=memo.get('content'),
-                        isDo=memo.get('isDo'), isStar=memo.get('isStar'), targetDate=memo.get('targetDate'))
+        memo_obj = Memo(index=last_memo_index, owner=user, group=group, content=content,
+                        isDo=isDo, isStar=isStar, targetDate=targetDate)
         # memo_obj.save()
     except:
         print("[Add request: Memo] ERROR")
