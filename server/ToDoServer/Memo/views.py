@@ -176,10 +176,19 @@ def update_memo_index(request):
 
 
 def update_memo(request):
+    memo = json.loads(request.POST['memo'])
+    print(json.dumps(memo, indent=4), type(memo))
     user = request.POST['user']
-    memo = request.POST['memo']
-    # memo 안에 JSON 오브젝트 형태로 담을 예정
-    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+    print(user, type(user))
+
+    # group = memo.get('group') if memo.get('group') is not None else ''
+    group = None
+    content = memo.get('content') if memo.get('content') is not None else ''
+    isDo = memo.get('isDo') if memo.get('isDo') is not None else False
+    isStar = memo.get('isStar') if memo.get('isStar') is not None else False
+    targetDate = memo.get('targetDate') if memo.get('targetDate') is not None else None
+
+    print(group, content, isDo, isStar, targetDate)
 
     ########################
     # user 검증 코드 들어가야함 #
@@ -211,11 +220,11 @@ def update_memo(request):
     #         between_memo.save()
     #     memo_obj.index = memo.index
 
-    memo_obj.group = memo.group
-    memo_obj.content = memo.content
-    memo_obj.isDo = memo.isDo == 'True'
-    memo_obj.isStar = memo.isStar == 'True'
-    memo_obj.targetDate = memo.targetDate
+    memo_obj.group = group
+    memo_obj.content = content
+    memo_obj.isDo = isDo
+    memo_obj.isStar = isStar
+    memo_obj.targetDate = targetDate
 
     memo_obj.save()
     return HttpResponse(status=200)
