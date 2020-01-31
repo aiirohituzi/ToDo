@@ -135,10 +135,16 @@ def add_memo(request):
 
 
 def update_memo_index(request):
+    memo = json.loads(request.POST['memo'])
+    print(json.dumps(memo, indent=4), type(memo))
     user = request.POST['user']
-    memo = request.POST['memo']
-    # memo 안에 JSON 오브젝트 형태로 담을 예정
-    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+    print(user, type(user))
+
+    if memo.get('index') is None:
+        return HttpResponseServerError()
+
+    memo_id = memo.get('id')
+    index = memo.get('index')
 
     ########################
     # user 검증 코드 들어가야함 #
@@ -146,7 +152,7 @@ def update_memo_index(request):
     ########################
 
     try:
-        memo_obj = Memo.objects.get(id=memo.id)
+        memo_obj = Memo.objects.get(id=memo_id)
     except Photo.DoesNotExist:
         print(
             "[Update request: Index of Memo] Failed!!! No Memo matches the given query.")
@@ -154,22 +160,22 @@ def update_memo_index(request):
 
     # filter(Q(<condition_1>)|Q(<condition_2>))
 
-    if memo_obj.index < memo.index:
+    if memo_obj.index < index:
         # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
         between_memo_set = Memo.objects.filter(
-            Q(id > memo_obj.index) & Q(id <= memo.index))
+            Q(id > memo_obj.index) & Q(id <= index))
         for between_memo in between_memo_set:
             between_memo.index = between_memo.index - 1
         between_memo.save()
-    elif memo_obj.index > memo.index:
+    elif memo_obj.index > index:
         # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
         between_memo_set = Memo.objects.filter(
-            Q(id < memo_obj.index) & Q(id >= memo.index))
+            Q(id < memo_obj.index) & Q(id >= index))
         for between_memo in between_memo_set:
             between_memo.index = between_memo.index + 1
         between_memo.save()
 
-    memo_obj.index = memo.index
+    memo_obj.index = index
     memo_obj.save()
 
     return HttpResponse(status=200)
@@ -181,8 +187,8 @@ def update_memo(request):
     user = request.POST['user']
     print(user, type(user))
 
-    # group = memo.get('group') if memo.get('group') is not None else ''
-    group = None
+    memo_id = memo.get('id')
+    group = memo.get('group') if memo.get('group') is not None else ''
     content = memo.get('content') if memo.get('content') is not None else ''
     isDo = memo.get('isDo') if memo.get('isDo') is not None else False
     isStar = memo.get('isStar') if memo.get('isStar') is not None else False
@@ -196,7 +202,7 @@ def update_memo(request):
     ########################
 
     try:
-        memo_obj = Memo.objects.get(id=memo.id)
+        memo_obj = Memo.objects.get(id=memo_id)
     except Photo.DoesNotExist:
         print("[Update request: Memo] Failed!!! No Memo matches the given query.")
         return HttpResponseServerError()
