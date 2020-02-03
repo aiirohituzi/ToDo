@@ -166,14 +166,14 @@ def update_memo_index(request):
             Q(id > memo_obj.index) & Q(id <= index))
         for between_memo in between_memo_set:
             between_memo.index = between_memo.index - 1
-        between_memo.save()
+            between_memo.save()
     elif memo_obj.index > index:
         # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
         between_memo_set = Memo.objects.filter(
             Q(id < memo_obj.index) & Q(id >= index))
         for between_memo in between_memo_set:
             between_memo.index = between_memo.index + 1
-        between_memo.save()
+            between_memo.save()
 
     memo_obj.index = index
     memo_obj.save()
@@ -306,14 +306,14 @@ def update_group_index(request):
             Q(id > group_obj.index) & Q(id <= group.index))
         for between_group in between_group_set:
             between_group.index = between_group.index - 1
-        between_group.save()
+            between_group.save()
     elif group_obj.index > group.index:
         # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
         between_group_set = Group.objects.filter(
             Q(id < group_obj.index) & Q(id >= group.index))
         for between_group in between_group_set:
             between_group.index = between_group.index + 1
-        between_group.save()
+            between_group.save()
 
     group_obj.index = group.index
     group_obj.save()
@@ -363,8 +363,13 @@ def delete_group(request):
         print("[Update request: Group] Failed!!! No Group matches the given query.")
         return HttpResponseServerError()
 
-    group_obj.delete()
+    # 삭제 시 삭제할 항목의 뒷번호들의 index--  
+    between_group_set = Group.objects.filter(
+        Q(index < group_obj.index) & Q(index >= 0))
+    for between_group in between_group_set:
+        between_group.index = between_group.index - 1
+        between_group.save()
 
-    # 삭제 시 삭제할 항목의 뒷번호들의 index--
+    group_obj.delete()
 
     return HttpResponse(status=200)
