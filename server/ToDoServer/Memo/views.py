@@ -248,12 +248,17 @@ def delete_memo(request):
     try:
         memo_obj = Memo.objects.get(id=memo_id)
     except Photo.DoesNotExist:
-        print("[Update request: Memo] Failed!!! No Memo matches the given query.")
+        print("[Delete request: Memo] Failed!!! No Memo matches the given query.")
         return HttpResponseServerError()
 
-    memo_obj.delete()
 
     # 삭제 시 삭제할 항목의 뒷번호들의 index--
+    between_memo_set = Group.objects.filter(Q(index > memo_obj.index))
+    for between_memo in between_memo_set:
+        between_memo.index = between_memo.index - 1
+        between_memo.save()
+        
+    memo_obj.delete()
 
     return HttpResponse(status=200)
 
@@ -282,9 +287,7 @@ def add_group(request):
 
 def update_group_index(request):
     user = request.POST['user']
-    group = request.POST['group']
-    # group 안에 JSON 오브젝트 형태로 담을 예정
-    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+    group_index = request.POST['group_index']
 
     ########################
     # user 검증 코드 들어가야함 #
@@ -300,49 +303,48 @@ def update_group_index(request):
 
     # filter(Q(<condition_1>)|Q(<condition_2>))
 
-    if group_obj.index < group.index:
+    if group_obj.index < group_index:
         # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
         between_group_set = Group.objects.filter(
-            Q(id > group_obj.index) & Q(id <= group.index))
+            Q(id > group_obj.index) & Q(id <= group_index))
         for between_group in between_group_set:
             between_group.index = between_group.index - 1
             between_group.save()
-    elif group_obj.index > group.index:
+    elif group_obj.index > group_index:
         # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
         between_group_set = Group.objects.filter(
-            Q(id < group_obj.index) & Q(id >= group.index))
+            Q(id < group_obj.index) & Q(id >= group_index))
         for between_group in between_group_set:
             between_group.index = between_group.index + 1
             between_group.save()
 
-    group_obj.index = group.index
+    group_obj.index = group_index
     group_obj.save()
 
     return HttpResponse(status=200)
 
 
 def update_group(request):
+    group = json.loads(request.POST['group'])
+    print(json.dumps(group, indent=4), type(group))
     user = request.POST['user']
-    group = request.POST['group']
-    # group 안에 JSON 오브젝트 형태로 담을 예정
-    # String으로 값이 넘어올 수 있음, 확인 후 변환작업 필요
+    print(user, type(user))
+
+    group_id = group.get('id')
+    group_name = group.get('name')
 
     ########################
     # user 검증 코드 들어가야함 #
     # 아니면 데코레이터로 처리   #
     ########################
 
-    # 수정작업 시 index 처리 경우의 수
-    # 뒷번호에서 앞번호로 이동한 경우 : 앞번호를 포함한 두 번호 사이에 있는 모든 항목들의 index++
-    # 앞번호에서 뒷번호로 이동한 경우 : 뒷번호를 포함한 두 번호 사이에 있는 모든 항목들의 index--
-
     try:
-        group_obj = Group.objects.get(id=group.id)
+        group_obj = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
         print("[Update request: Group] Failed!!! No Group matches the given query.")
         return HttpResponseServerError()
 
-    group_obj.group_name = group.group_name
+    group_obj.group_name = group_name
 
     group_obj.save()
     return HttpResponse(status=200)
@@ -360,12 +362,11 @@ def delete_group(request):
     try:
         group_obj = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
-        print("[Update request: Group] Failed!!! No Group matches the given query.")
+        print("[Delete request: Group] Failed!!! No Group matches the given query.")
         return HttpResponseServerError()
 
     # 삭제 시 삭제할 항목의 뒷번호들의 index--  
-    between_group_set = Group.objects.filter(
-        Q(index < group_obj.index) & Q(index >= 0))
+    between_group_set = Group.objects.filter(Q(index > group_obj.index))
     for between_group in between_group_set:
         between_group.index = between_group.index - 1
         between_group.save()
