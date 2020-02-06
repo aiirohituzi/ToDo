@@ -20,5 +20,16 @@ from Memo import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('allMemo/', views.get_all_memo),
+    path('allMemo/', views.get_all_group),
+    path('allMemo/', views.get_memo_by_group_id),
+
     path('addMemo/', views.add_memo),
+    path('addMemo/', views.update_memo_index),
+    path('addMemo/', views.update_memo),
+    path('addMemo/', views.delete_memo),
+
+    path('addMemo/', views.add_group),
+    path('addMemo/', views.update_group_index),
+    path('addMemo/', views.update_group),
+    path('addMemo/', views.delete_group),
 ]
