@@ -19,17 +19,21 @@ from Memo import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('signIn/', views.sign_in),
+    path('signOut/', views.sign_out),
+
     path('allMemo/', views.get_all_memo),
-    path('allMemo/', views.get_all_group),
-    path('allMemo/', views.get_memo_by_group_id),
+    path('allGroup/', views.get_all_group),
+    path('getMemoByGroupId/', views.get_memo_by_group_id),
 
     path('addMemo/', views.add_memo),
-    path('addMemo/', views.update_memo_index),
-    path('addMemo/', views.update_memo),
-    path('addMemo/', views.delete_memo),
+    path('updateMemoIndex/', views.update_memo_index),
+    path('updateIndex/', views.update_memo),
+    path('deleteMemo/', views.delete_memo),
 
-    path('addMemo/', views.add_group),
-    path('addMemo/', views.update_group_index),
-    path('addMemo/', views.update_group),
-    path('addMemo/', views.delete_group),
+    path('addGroup/', views.add_group),
+    path('updateGroupIndex/', views.update_group_index),
+    path('updateGroupIndex/', views.update_group),
+    path('deleteGroup/', views.delete_group),
 ]

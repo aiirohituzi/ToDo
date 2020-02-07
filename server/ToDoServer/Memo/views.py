@@ -5,10 +5,32 @@ from django.http import HttpResponseServerError, HttpResponse
 from django.db.models import Max
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
+@csrf_exempt
+def sign_in(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    print(username, password)
+    user = authenticate(request, username=username, password=password)
+    print(user)
+    if user is not None:
+        result = login(request, user)
+        print(result)
+        # 인증 성공
+        return HttpResponse(result)
+    else:
+        # 인증 실패
+        return HttpResponse("failed")
 
 
+@csrf_exempt
+def sign_out(request):
+    logout(request)
+    return HttpResponse("logout")
+
+@login_required
 def get_all_memo(request):
     data = []
     user = request.GET.get('user', None)
