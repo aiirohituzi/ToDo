@@ -12,23 +12,27 @@ from django.contrib.auth.decorators import login_required
 def sign_in(request):
     username = request.POST['username']
     password = request.POST['password']
-    print(username, password)
+    # print(username, password)
     user = authenticate(request, username=username, password=password)
-    print(user)
+    # print(user)
     if user is not None:
-        result = login(request, user)
-        print(result)
         # 인증 성공
-        return HttpResponse(result)
+        login(request, user)
+        print(f'[Login request: "{user}" login success]')
+        return HttpResponse("login")
     else:
         # 인증 실패
+        print(f'[Login request: login failed..]')
         return HttpResponse("failed")
 
 
+@login_required
 @csrf_exempt
 def sign_out(request):
+    print(f'[Logout request: {request.user}]')
     logout(request)
     return HttpResponse("logout")
+
 
 @login_required
 def get_all_memo(request):
@@ -61,6 +65,7 @@ def get_all_memo(request):
     return HttpResponse(data, content_type="application/json")
 
 
+@login_required
 def get_all_group(request):
     data = []
     user = request.GET.get('user', None)
@@ -85,6 +90,7 @@ def get_all_group(request):
     return HttpResponse(data, content_type="application/json")
 
 
+@login_required
 def get_memo_by_group_id(request, group_id):
     # memo = get_object_or_404(Memo, group=group_id) 이 방식 괜찮은지 후에 검토
     data = []
@@ -121,6 +127,7 @@ def get_memo_by_group_id(request, group_id):
     return HttpResponse(data, content_type="application/json")
 
 
+@login_required
 @csrf_exempt
 def add_memo(request):
     memo = json.loads(request.POST['memo'])
@@ -156,6 +163,7 @@ def add_memo(request):
     return HttpResponse(status=200)
 
 
+@login_required
 def update_memo_index(request):
     memo = json.loads(request.POST['memo'])
     print(json.dumps(memo, indent=4), type(memo))
@@ -203,6 +211,7 @@ def update_memo_index(request):
     return HttpResponse(status=200)
 
 
+@login_required
 def update_memo(request):
     memo = json.loads(request.POST['memo'])
     print(json.dumps(memo, indent=4), type(memo))
@@ -258,6 +267,7 @@ def update_memo(request):
     return HttpResponse(status=200)
 
 
+@login_required
 def delete_memo(request):
     user = request.POST['user']
     memo_id = request.POST['memo_id']
@@ -285,6 +295,7 @@ def delete_memo(request):
     return HttpResponse(status=200)
 
 
+@login_required
 def add_group(request):
     user = request.POST['user']
     group_name = request.POST['group_name']
@@ -307,6 +318,7 @@ def add_group(request):
     return HttpResponse(status=200)
 
 
+@login_required
 def update_group_index(request):
     user = request.POST['user']
     group_index = request.POST['group_index']
@@ -346,6 +358,7 @@ def update_group_index(request):
     return HttpResponse(status=200)
 
 
+@login_required
 def update_group(request):
     group = json.loads(request.POST['group'])
     print(json.dumps(group, indent=4), type(group))
@@ -372,6 +385,7 @@ def update_group(request):
     return HttpResponse(status=200)
 
 
+@login_required
 def delete_group(request):
     user = request.POST['user']
     group_id = request.POST['group_id']
