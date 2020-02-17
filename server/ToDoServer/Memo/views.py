@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 @csrf_exempt
 def sign_in(request):
@@ -36,8 +37,8 @@ def sign_out(request):
 
 @login_required
 def get_all_memo(request):
+    user = request.user
     data = []
-    user = request.GET.get('user', None)
     # user에 대한 자세한 값은 후에 인증기능 추가 후 알맞게 수정
     # 임시로 모양만 구현
     try:
@@ -67,10 +68,9 @@ def get_all_memo(request):
 
 @login_required
 def get_all_group(request):
+    user = request.user
     data = []
-    user = request.GET.get('user', None)
-    # user에 대한 자세한 값은 후에 인증기능 추가 후 알맞게 수정
-    # 임시로 모양만 구현
+    
     try:
         for item in Group.objects.filter(owner=user).order_by('-created_at'):
             data.append({
@@ -92,12 +92,9 @@ def get_all_group(request):
 
 @login_required
 def get_memo_by_group_id(request, group_id):
+    user = request.user
     # memo = get_object_or_404(Memo, group=group_id) 이 방식 괜찮은지 후에 검토
     data = []
-    user = request.GET.get('user', None)
-    # user에 대한 자세한 값은 후에 인증기능 추가 후 알맞게 수정
-    # 임시로 모양만 구현
-    # group 이름을 받든 id를 받든 역시 추후 수정 필요
 
     if not group:
         return HttpResponse(status=400)
@@ -130,10 +127,9 @@ def get_memo_by_group_id(request, group_id):
 @login_required
 @csrf_exempt
 def add_memo(request):
+    user = request.user
     memo = json.loads(request.POST['memo'])
     print(json.dumps(memo, indent=4), type(memo))
-    user = request.POST['user']
-    print(user, type(user))
 
     # group = memo.get('group') if memo.get('group') is not None else ''
     group = None
@@ -143,11 +139,6 @@ def add_memo(request):
     targetDate = memo.get('targetDate') if memo.get('targetDate') is not None else None
 
     print(group, content, isDo, isStar, targetDate)
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     last_memo_index_obj = Memo.objects.aggregate(
         index=Max('index')).get('index')
@@ -165,21 +156,15 @@ def add_memo(request):
 
 @login_required
 def update_memo_index(request):
+    user = request.user
     memo = json.loads(request.POST['memo'])
     print(json.dumps(memo, indent=4), type(memo))
-    user = request.POST['user']
-    print(user, type(user))
 
     if memo.get('index') is None:
         return HttpResponseServerError()
 
     memo_id = memo.get('id')
     index = memo.get('index')
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     try:
         memo_obj = Memo.objects.get(id=memo_id)
@@ -213,10 +198,9 @@ def update_memo_index(request):
 
 @login_required
 def update_memo(request):
+    user = request.user
     memo = json.loads(request.POST['memo'])
     print(json.dumps(memo, indent=4), type(memo))
-    user = request.POST['user']
-    print(user, type(user))
 
     memo_id = memo.get('id')
     group = memo.get('group') if memo.get('group') is not None else ''
@@ -226,11 +210,6 @@ def update_memo(request):
     targetDate = memo.get('targetDate') if memo.get('targetDate') is not None else None
 
     print(group, content, isDo, isStar, targetDate)
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     try:
         memo_obj = Memo.objects.get(id=memo_id)
@@ -269,13 +248,8 @@ def update_memo(request):
 
 @login_required
 def delete_memo(request):
-    user = request.POST['user']
+    user = request.user
     memo_id = request.POST['memo_id']
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     try:
         memo_obj = Memo.objects.get(id=memo_id)
@@ -297,13 +271,8 @@ def delete_memo(request):
 
 @login_required
 def add_group(request):
-    user = request.POST['user']
+    user = request.user
     group_name = request.POST['group_name']
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     last_group_index = Group.objects.aggregate(
         index=Max('index'))['index'] + 1 or 0
@@ -320,13 +289,8 @@ def add_group(request):
 
 @login_required
 def update_group_index(request):
-    user = request.POST['user']
+    user = request.user
     group_index = request.POST['group_index']
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     try:
         group_obj = Group.objects.get(id=group.id)
@@ -360,18 +324,12 @@ def update_group_index(request):
 
 @login_required
 def update_group(request):
+    user = request.user
     group = json.loads(request.POST['group'])
     print(json.dumps(group, indent=4), type(group))
-    user = request.POST['user']
-    print(user, type(user))
 
     group_id = group.get('id')
     group_name = group.get('name')
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     try:
         group_obj = Group.objects.get(id=group_id)
@@ -387,13 +345,8 @@ def update_group(request):
 
 @login_required
 def delete_group(request):
-    user = request.POST['user']
+    user = request.user
     group_id = request.POST['group_id']
-
-    ########################
-    # user 검증 코드 들어가야함 #
-    # 아니면 데코레이터로 처리   #
-    ########################
 
     try:
         group_obj = Group.objects.get(id=group_id)
