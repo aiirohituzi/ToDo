@@ -25,6 +25,9 @@ const Header = () => {
       <Link href="/dragAnimation">
         <a style={linkStyle}>드래그 애니메이션</a>
       </Link>
+      <Link href="/login">
+        <a style={linkStyle}>로그인</a>
+      </Link>
     </div>
   );
 };

@@ -39,8 +39,7 @@ def sign_out(request):
 def get_all_memo(request):
     user = request.user
     data = []
-    # user에 대한 자세한 값은 후에 인증기능 추가 후 알맞게 수정
-    # 임시로 모양만 구현
+    
     try:
         for item in Memo.objects.filter(owner=user).order_by('-created_at'):
             data.append({
