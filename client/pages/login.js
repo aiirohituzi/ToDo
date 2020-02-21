@@ -1,7 +1,34 @@
 import Layout from "../components/Layout";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const login = () => {
+  const [result, setResult] = useState("default");
+
+  const login = async () => {
+    let id = document.getElementById("id").value;
+    let pw = document.getElementById("pw").value;
+    console.log(id, pw);
+
+    const data = new FormData();
+
+    data.append("username", id);
+    data.append("password", pw);
+
+    const config = {
+      headers: { "content-type": "multipart/form-data" }
+    };
+
+    await axios
+      .post("http://127.0.0.1:8000/signIn/", data, config)
+      .then(response => {
+        setResult(response);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   return (
     <Layout>
       <style>
@@ -18,7 +45,7 @@ const login = () => {
             text-align: center;
           }
 
-          .wrapper-login .title {
+          .wrapper-login .login-title {
             padding-top: 10%;
             height: 35%;
           }
@@ -55,7 +82,7 @@ const login = () => {
         `}
       </style>
       <div class="wrapper-login">
-        <div class="title">
+        <div class="login-title">
           <h2>로그인</h2>
         </div>
         <div class="input-group">
@@ -67,10 +94,11 @@ const login = () => {
           <input id="pw" type="text" />
         </div>
         <div class="button-group">
-          <button>로그인</button>
+          <button onClick={() => login()}>로그인</button>
           <button>회원가입</button>
         </div>
       </div>
+      <div>{result}</div>
     </Layout>
   );
 };
