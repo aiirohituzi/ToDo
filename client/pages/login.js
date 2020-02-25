@@ -22,6 +22,7 @@ const login = () => {
     await axios
       .post("http://127.0.0.1:8000/signIn/", data, config)
       .then(response => {
+        console.log(response);
         setResult(response);
       })
       .catch(error => {
@@ -30,7 +31,8 @@ const login = () => {
   };
 
   return (
-    <Layout>
+    // <Layout>
+    <div>
       <style>
         {`
           .wrapper-login {
@@ -99,7 +101,8 @@ const login = () => {
         </div>
       </div>
       <div>{result}</div>
-    </Layout>
+      {/* </Layout> */}
+    </div>
   );
 };
 
