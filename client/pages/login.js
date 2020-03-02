@@ -2,10 +2,10 @@ import Layout from "../components/Layout";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const login = () => {
+const Login = () => {
   const [result, setResult] = useState("default");
 
-  const login = async () => {
+  const signIn = async () => {
     let id = document.getElementById("id").value;
     let pw = document.getElementById("pw").value;
     console.log(id, pw);
@@ -23,7 +23,8 @@ const login = () => {
       .post("http://127.0.0.1:8000/signIn/", data, config)
       .then(response => {
         console.log(response);
-        setResult(response);
+        console.log(typeof response);
+        setResult(response.data);
       })
       .catch(error => {
         console.log(error);
@@ -96,7 +97,7 @@ const login = () => {
           <input id="pw" type="text" />
         </div>
         <div class="button-group">
-          <button onClick={() => login()}>로그인</button>
+          <button onClick={() => signIn()}>로그인</button>
           <button>회원가입</button>
         </div>
       </div>
@@ -106,4 +107,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;
