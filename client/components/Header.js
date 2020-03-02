@@ -28,6 +28,9 @@ const Header = () => {
       <Link href="/login">
         <a style={linkStyle}>로그인</a>
       </Link>
+      <Link href="/toDoList">
+        <a style={linkStyle}>전체 목록 보기</a>
+      </Link>
     </div>
   );
 };
