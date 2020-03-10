@@ -9,6 +9,50 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
+
+from rest_framework import viewsets, permissions, generics
+from rest_framework.response import Response
+from Memo.serializers import (
+    # NoteSerializer,
+    # CreateUserSerializer,
+    UserSerializer,
+    LoginUserSerializer,
+)
+from knox.models import AuthToken
+
+
+# https://velog.io/@killi8n/Dnote-5-1.-Django-%EA%B6%8C%ED%95%9C-%EC%84%A4%EC%A0%95-%EB%B0%8F-%EB%A1%9C%EA%B7%B8%EC%9D%B8-%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85-%EA%B5%AC%ED%98%84-tmjmep5tcm
+# https://behonestar.tistory.com/117
+
+
+class LoginAPI(generics.GenericAPIView):
+    serializer_class = LoginUserSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        print(serializer)
+        print(user)
+        print('-------------------------')
+        return Response(
+            {
+                "user": UserSerializer(
+                    user, context=self.get_serializer_context()
+                ).data,
+                "token": AuthToken.objects.create(user)[1],
+            }
+        )
+
+
+class UserAPI(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+
 @csrf_exempt
 def sign_in(request):
     username = request.POST['username']
@@ -39,6 +83,7 @@ def sign_out(request):
 def get_all_memo(request):
     user = request.user
     data = []
+    print(user)
     
     try:
         for item in Memo.objects.filter(owner=user).order_by('-created_at'):

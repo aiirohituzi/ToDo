@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from Memo import views
+from Memo.views import LoginAPI, UserAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,4 +37,7 @@ urlpatterns = [
     path('updateGroupIndex/', views.update_group_index),
     path('updateGroupIndex/', views.update_group),
     path('deleteGroup/', views.delete_group),
+
+    path('auth/login/', LoginAPI.as_view()),
+    path('auth/user/', UserAPI.as_view()),
 ]

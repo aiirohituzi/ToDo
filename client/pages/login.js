@@ -16,15 +16,18 @@ const Login = () => {
     data.append("password", pw);
 
     const config = {
-      headers: { "content-type": "multipart/form-data" }
+      headers: {
+        "content-type": "multipart/form-data",
+        Connection: "keep-alive"
+      }
     };
 
     await axios
-      .post("http://127.0.0.1:8000/signIn/", data, config)
+      .post("http://127.0.0.1:8000/auth/login/", data, config)
       .then(response => {
         console.log(response);
         console.log(typeof response);
-        setResult(response.data);
+        setResult(response.data.token);
       })
       .catch(error => {
         console.log(error);
